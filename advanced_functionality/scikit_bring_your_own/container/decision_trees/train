@@ -60,13 +60,14 @@ def train():
         #
         # set up label encoders for categorical vars
         #
+        encoders = {}
         callTypes = vars.iloc[:, 7].unique()
         langs = vars.iloc[:, 8].unique()
-        callTypeEncoder = preprocessing.LabelEncoder().fit(callTypes)
-        languageEncoder = preprocessing.LabelEncoder().fit(langs)
+        encoders['callType'] = preprocessing.LabelEncoder().fit(callTypes)
+        encoders['language'] = preprocessing.LabelEncoder().fit(langs)
 
-        vars.iloc[:, 7] = callTypeEncoder.transform(vars.iloc[:, 7])
-        vars.iloc[:, 8] = languageEncoder.transform(vars.iloc[:, 8])
+        vars.iloc[:, 7] = encoders['callType'].transform(vars.iloc[:, 7])
+        vars.iloc[:, 8] = encoders['language'].transform(vars.iloc[:, 8])
 
         #
         # build and train the model
@@ -91,6 +92,11 @@ def train():
         # save the model
         with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'w') as out:
             pickle.dump(clf, out)
+
+        # save the encoders
+        with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'w') as out:
+            pickle.dump(encoders, out)
+
         print('Training complete.')
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the

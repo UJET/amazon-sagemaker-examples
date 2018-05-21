@@ -23,12 +23,21 @@ model_path = os.path.join(prefix, 'model')
 
 class ScoringService(object):
     model = None                # Where we keep the model when it's loaded
+    encoders = None
 
     @classmethod
     def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.model == None:
             with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'r') as inp:
+                cls.model = pickle.load(inp)
+        return cls.model
+
+    @classmethod
+    def get_encoders(cls):
+        """Get the model encoders for this instance, loading if not already loaded."""
+        if cls.encoders == None:
+            with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'r') as inp:
                 cls.model = pickle.load(inp)
         return cls.model
 
@@ -40,6 +49,12 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         clf = cls.get_model()
+        encoders = cls.get_encoders()
+
+        # apply encoders
+        input.iloc[:, 7] = encoders['callType'].transform(input.iloc[:, 7])
+        input.iloc[:, 8] = encoders['language'].transform(input.iloc[:, 8])
+
         return clf.predict(input)
 
 # The flask app for serving predictions
