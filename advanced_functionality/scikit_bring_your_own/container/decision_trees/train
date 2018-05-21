@@ -61,8 +61,9 @@ def train():
         # set up label encoders for categorical vars
         #
         encoders = {}
-        callTypes = vars.iloc[:, 7].unique()
-        langs = vars.iloc[:, 8].unique()
+        # add 'unknown' element so that novel values can be handled gracefully
+        callTypes = np.append(vars.iloc[:, 7].unique(), ["<unknown>"])
+        langs = np.append(vars.iloc[:, 8].unique(), ["<unknown>"])
         encoders['callType'] = preprocessing.LabelEncoder().fit(callTypes)
         encoders['language'] = preprocessing.LabelEncoder().fit(langs)
 

@@ -51,9 +51,17 @@ class ScoringService(object):
         clf = cls.get_model()
         encoders = cls.get_encoders()
 
-        # apply encoders
-        input.iloc[:, 7] = encoders['callType'].transform(input.iloc[:, 7])
-        input.iloc[:, 8] = encoders['language'].transform(input.iloc[:, 8])
+        # Apply encoders
+        # series is a Pandas series
+        def resetNovelValuesAndTransform(series, encoder):
+            for i, value in series.iteritems():
+                if value not in encoder.classes_:
+                    series[i] = "<unknown>"
+            return encoder.transform(series)
+
+        # catch novel values
+        input.iloc[:, 7] = resetNovelValuesAndTransform(input.iloc[:, 7], encoders['callType'])
+        input.iloc[:, 8] = resetNovelValuesAndTransform(input.iloc[:, 8], encoders['language'])
 
         return clf.predict(input)
 
