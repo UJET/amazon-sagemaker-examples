@@ -66,7 +66,7 @@ class ScoringService(object):
         iVars.iloc[:, 7] = resetNovelValuesAndTransform(iVars.iloc[:, 7], encoders['callType'])
         iVars.iloc[:, 8] = resetNovelValuesAndTransform(iVars.iloc[:, 8], encoders['language'])
 
-        return clf.predict(input)
+        return clf.predict(iVars)
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
