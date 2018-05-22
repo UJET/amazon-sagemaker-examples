@@ -10,6 +10,7 @@ import StringIO
 import sys
 import signal
 import traceback
+import time
 
 import flask
 
@@ -87,6 +88,7 @@ def transformation():
     just means one prediction per line, since there's a single column.
     """
     data = None
+    start = time.time()
 
     # Convert from CSV to pandas
     if flask.request.content_type == 'text/csv':
@@ -105,5 +107,7 @@ def transformation():
     out = StringIO.StringIO()
     pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
     result = out.getvalue()
+
+    print("Finished in " + str(time.time() - start) + " seconds")
 
     return flask.Response(response=result, status=200, mimetype='text/csv')
