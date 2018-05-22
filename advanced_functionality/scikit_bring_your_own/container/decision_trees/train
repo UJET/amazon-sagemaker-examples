@@ -35,25 +35,20 @@ channel_name='training'
 training_path = os.path.join(input_path, channel_name)
 
 def convertHyperParams(params):
-    n_estimators = params.get('n_estimators', None)
-    if n_estimators is not None:
-        params.n_estimators = int(n_estimators)
+    if 'n_estimators' in params:
+        params.n_estimators = int(params.n_estimators)
 
-    max_depth = params.get('max_depth', None)
-    if max_depth is not None:
-        params.max_depth = int(max_depth)
+    if 'max_depth' in params:
+        params.max_depth = int(params.max_depth)
 
-    min_samples_split = params.get('min_samples_split', None)
-    if min_samples_split is not None:
-        params.min_samples_split = int(min_samples_split)
+    if 'min_samples_split' in params:
+        params.min_samples_split = int(params.min_samples_split)
 
-    learning_rate = params.get('learning_rate', None)
-    if learning_rate is not None:
-        params.learning_rate = float(learning_rate)
+    if 'learning_rate' in params:
+        params.learning_rate = float(params.learning_rate)
 
-    verbose = params.get('verbose', None)
-    if verbose is not None:
-        params.verbose = params.verbose == "True"
+    if 'verbose' in params:
+        params.verbose = params.verbose == 'True'
 
 # The function to execute the training.
 def train():
