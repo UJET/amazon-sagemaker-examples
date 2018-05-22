@@ -48,6 +48,9 @@ class ScoringService(object):
         Args:
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
+        # Separate input vars from identifier
+        iVars = input.iloc[:, 1:]
+
         clf = cls.get_model()
         encoders = cls.get_encoders()
 
@@ -60,8 +63,8 @@ class ScoringService(object):
             return encoder.transform(series)
 
         # catch novel values
-        input.iloc[:, 7] = resetNovelValuesAndTransform(input.iloc[:, 7], encoders['callType'])
-        input.iloc[:, 8] = resetNovelValuesAndTransform(input.iloc[:, 8], encoders['language'])
+        iVars.iloc[:, 7] = resetNovelValuesAndTransform(iVars.iloc[:, 7], encoders['callType'])
+        iVars.iloc[:, 8] = resetNovelValuesAndTransform(iVars.iloc[:, 8], encoders['language'])
 
         return clf.predict(input)
 
