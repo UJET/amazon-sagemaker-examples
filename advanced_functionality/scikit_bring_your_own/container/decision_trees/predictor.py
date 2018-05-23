@@ -19,31 +19,40 @@ import pandas as pd
 prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
+scoringService = None
+
 # A singleton for holding the model. This simply loads the model and holds it.
 # It has a predict function that does a prediction based on the model and the input data.
-
 class ScoringService(object):
-    model = None                # Where we keep the model when it's loaded
-    encoders = None
+    def __init__(self):
+        self.model = self.get_model()
+        self.encoders = self.get_encoders()
 
-    @classmethod
-    def get_model(cls):
+    def get_model(self):
         """Get the model object for this instance, loading it if it's not already loaded."""
-        if cls.model == None:
-            with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'r') as inp:
-                cls.model = pickle.load(inp)
-        return cls.model
+        print("Loading model")
+        self.model = self.getModelFromFile()
+        return self.model
 
-    @classmethod
-    def get_encoders(cls):
+    def getModelFromFile(self):
+        try:
+            filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
+            with open(filePath, 'r') as inp:
+                print("Model filesize: " + str(os.path.getsize(filePath)))
+                return pickle.load(inp)
+        except IOError as e:
+            print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+
+    def get_encoders(self):
         """Get the model encoders for this instance, loading if not already loaded."""
-        if cls.encoders == None:
+        if self.encoders == None:
             with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'r') as inp:
-                cls.model = pickle.load(inp)
-        return cls.model
+                self.model = pickle.load(inp)
+        return self.model
 
-    @classmethod
-    def predict(cls, input):
+    def predict(self, input):
         """For the input, do the predictions and return them.
 
         Args:
@@ -51,9 +60,6 @@ class ScoringService(object):
                 one prediction per row in the dataframe"""
         # Separate input vars from identifier
         iVars = input.iloc[:, 1:]
-
-        clf = cls.get_model()
-        encoders = cls.get_encoders()
 
         # Apply encoders
         # series is a Pandas series
@@ -64,10 +70,10 @@ class ScoringService(object):
             return encoder.transform(series)
 
         # catch novel values
-        iVars.iloc[:, 7] = resetNovelValuesAndTransform(iVars.iloc[:, 7], encoders['callType'])
-        iVars.iloc[:, 8] = resetNovelValuesAndTransform(iVars.iloc[:, 8], encoders['language'])
+        iVars.iloc[:, 7] = resetNovelValuesAndTransform(iVars.iloc[:, 7], self.encoders['callType'])
+        iVars.iloc[:, 8] = resetNovelValuesAndTransform(iVars.iloc[:, 8], self.encoders['language'])
 
-        return clf.predict(iVars)
+        return self.model.predict(iVars)
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
@@ -87,6 +93,10 @@ def transformation():
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
     just means one prediction per line, since there's a single column.
     """
+    global scoringService
+    if scoringService == None:
+        scoringService = ScoringService()
+
     data = None
     start = time.time()
 
