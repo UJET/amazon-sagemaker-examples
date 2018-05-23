@@ -90,11 +90,18 @@ class ScoringService(object):
 # The flask app for serving predictions
 app = flask.Flask(__name__)
 
+def getScoringService():
+    global scoringService
+    if scoringService == None:
+        scoringService = ScoringService()
+    return scoringService
+
 @app.route('/ping', methods=['GET'])
 def ping():
     """Determine if the container is working and healthy. In this sample container, we declare
     it healthy if we can load the model successfully."""
-    global scoringService
+    scoringService = getScoringService()
+
     health = scoringService.get_model() is not None  # You can insert a health check here
 
     status = 200 if health else 404
@@ -106,9 +113,7 @@ def transformation():
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
     just means one prediction per line, since there's a single column.
     """
-    global scoringService
-    if scoringService == None:
-        scoringService = ScoringService()
+    scoringService = getScoringService()
 
     data = None
     start = time.time()
