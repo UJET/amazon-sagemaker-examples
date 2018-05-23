@@ -30,8 +30,9 @@ class ScoringService(object):
 
     def get_model(self):
         """Get the model object for this instance, loading it if it's not already loaded."""
-        print("Loading model")
-        self.model = self.getModelFromFile()
+        print("Loading Model")
+        if not hasattr(self, 'model'):
+            self.model = self.getModelFromFile()
         return self.model
 
     def getModelFromFile(self):
@@ -39,7 +40,7 @@ class ScoringService(object):
             filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
             with open(filePath, 'r') as inp:
                 print("Model filesize: " + str(os.path.getsize(filePath)))
-                return pickle.load(inp)
+                self.model = pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
         except:
@@ -47,10 +48,21 @@ class ScoringService(object):
 
     def get_encoders(self):
         """Get the model encoders for this instance, loading if not already loaded."""
-        if self.encoders == None:
-            with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'r') as inp:
-                self.model = pickle.load(inp)
-        return self.model
+        print("Loading Encoders")
+        if not hasattr(self, 'encoders'):
+            self.getEncodersFromFile()
+        return self.encoders
+
+    def getEncodersFromFile(self):
+        try:
+            filePath = os.path.join(model_path, 'boosted-trees-encoders.pkl')
+            with open(filePath, 'r') as inp:
+                print("Encoders filesize: " + str(os.path.getsize(filePath)))
+                self.encoders = pickle.load(inp)
+        except IOError as e:
+            print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
 
     def predict(self, input):
         """For the input, do the predictions and return them.
