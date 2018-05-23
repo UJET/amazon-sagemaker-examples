@@ -123,7 +123,7 @@ def transformation():
     print('Invoked with {} records'.format(data.shape[0]))
 
     # Do the prediction
-    predictions = ScoringService.predict(data)
+    predictions = scoringService.predict(data)
 
     # Convert from numpy back to CSV
     out = StringIO.StringIO()
