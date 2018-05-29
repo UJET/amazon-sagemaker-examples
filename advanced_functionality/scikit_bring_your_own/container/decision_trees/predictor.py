@@ -11,7 +11,7 @@ import sys
 import signal
 import traceback
 import time
-
+import codecs
 import flask
 
 import pandas as pd
@@ -38,7 +38,7 @@ class ScoringService(object):
     def getModelFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
-            with open(filePath, 'rb', encoding='utf-8') as inp:
+            with codecs.open(filePath, 'rb', encoding='utf-8') as inp:
                 print("Model filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
@@ -56,7 +56,7 @@ class ScoringService(object):
     def getEncodersFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-encoders.pkl')
-            with open(filePath, 'rb', encoding='utf-8') as inp:
+            with codecs.open(filePath, 'rb', encoding='utf-8') as inp:
                 print("Encoders filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
