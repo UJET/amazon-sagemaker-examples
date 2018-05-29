@@ -106,11 +106,11 @@ def train():
 
         # save the model
         with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'w') as out:
-            pickle.dump(clf, out)
+            pickle.dump(clf, out, protocol=2)
 
         # save the encoders
         with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'w') as out:
-            pickle.dump(encoders, out)
+            pickle.dump(encoders, out, protocol=2)
 
         print('Training complete.')
     except Exception as e:

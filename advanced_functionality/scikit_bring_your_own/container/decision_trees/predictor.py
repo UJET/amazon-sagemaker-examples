@@ -38,13 +38,15 @@ class ScoringService(object):
     def getModelFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
-            with open(filePath, 'r') as inp:
+            with open(filePath, 'rb') as inp:
                 print("Model filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        except Exception as e:
+            print("Unexpected exception: ", e)
         except:
-            print("Unexpected error:", sys.exc_info()[0])
+            print("Unexpected error: ", sys.exc_info()[0])
 
     def get_encoders(self):
         """Get the model encoders for this instance, loading if not already loaded."""
@@ -56,11 +58,13 @@ class ScoringService(object):
     def getEncodersFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-encoders.pkl')
-            with open(filePath, 'r') as inp:
+            with open(filePath, 'rb') as inp:
                 print("Encoders filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        except Exception as e:
+            print("Unexpected exception: ", e)
         except:
             print("Unexpected error:", sys.exc_info()[0])
 
