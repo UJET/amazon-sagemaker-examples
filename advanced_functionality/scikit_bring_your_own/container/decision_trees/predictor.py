@@ -46,7 +46,7 @@ class ScoringService(object):
         except Exception as e:
             print("Unexpected exception: ", e)
         except:
-            print("Unexpected error: ", sys.exc_info()[0])
+            print("Unexpected error: ", sys.exc_info())
 
     def get_encoders(self):
         """Get the model encoders for this instance, loading if not already loaded."""
@@ -66,7 +66,7 @@ class ScoringService(object):
         except Exception as e:
             print("Unexpected exception: ", e)
         except:
-            print("Unexpected error:", sys.exc_info()[0])
+            print("Unexpected error:", sys.exc_info())
 
     def predict(self, input):
         """For the input, do the predictions and return them.
