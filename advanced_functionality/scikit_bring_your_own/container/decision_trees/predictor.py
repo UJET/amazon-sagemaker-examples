@@ -38,9 +38,9 @@ class ScoringService(object):
     def getModelFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
-            with open(filePath, 'rb') as inp:
+            with open(filePath, 'rb', encoding='utf-8') as inp:
                 print("Model filesize: " + str(os.path.getsize(filePath)))
-                return pickle.load(inp, encoding="UTF8")
+                return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
         except:
@@ -56,9 +56,9 @@ class ScoringService(object):
     def getEncodersFromFile(self):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-encoders.pkl')
-            with open(filePath, 'rb') as inp:
+            with open(filePath, 'rb', encoding='utf-8') as inp:
                 print("Encoders filesize: " + str(os.path.getsize(filePath)))
-                return pickle.load(inp, encoding="UTF8")
+                return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
         except:
