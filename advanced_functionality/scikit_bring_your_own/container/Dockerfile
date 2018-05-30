@@ -6,10 +6,13 @@ FROM ubuntu:16.04
 
 MAINTAINER Amazon AI <sage-learner@amazon.com>
 
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+        software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa
 
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
          wget \
-         python \
+         python3.6 \
          nginx \
          ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -19,10 +22,12 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
 # linking them together. Likewise, pip leaves the install caches populated which uses
 # a significant amount of space. These optimizations save a fair amount of space in the
 # image, which reduces start up time.
-RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && \
-    pip install numpy scipy scikit-learn pandas flask gevent gunicorn && \
-        (cd /usr/local/lib/python2.7/dist-packages/scipy/.libs; rm *; ln ../../numpy/.libs/* .) && \
-        rm -rf /root/.cache
+RUN wget https://bootstrap.pypa.io/get-pip.py && python3.6 get-pip.py && \
+    pip3 install numpy scipy scikit-learn pandas flask gevent gunicorn && \
+    (cd /usr/local/lib/python3.6/dist-packages/scipy/.libs; rm *; ln ../../numpy/.libs/* .) && \
+    rm -rf /root/.cache
+
+RUN python3.6 -V
 
 # Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
 # output stream, which means that logs can be delivered to the user quickly. PYTHONDONTWRITEBYTECODE
