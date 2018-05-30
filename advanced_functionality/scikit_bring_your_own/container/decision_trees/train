@@ -48,7 +48,7 @@ def convertHyperParams(params):
         params['learning_rate'] = float(params['learning_rate'])
 
     if 'verbose' in params:
-        params['verbose'] = params['verbose'] == 'True'
+        params['verbose'] = params['verbose']
 
 # The function to execute the training.
 def train():
