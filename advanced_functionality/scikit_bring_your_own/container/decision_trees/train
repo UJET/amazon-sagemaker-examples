@@ -105,12 +105,12 @@ def train():
         clf = clf.fit(X_train, y_train)
 
         # save the model
-        with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'w') as out:
-            pickle.dump(clf, out, protocol=2)
+        with open(os.path.join(model_path, 'boosted-trees-model.pkl'), 'wb') as out:
+            pickle.dump(clf, out)
 
         # save the encoders
-        with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'w') as out:
-            pickle.dump(encoders, out, protocol=2)
+        with open(os.path.join(model_path, 'boosted-trees-encoders.pkl'), 'wb') as out:
+            pickle.dump(encoders, out)
 
         print('Training complete.')
     except Exception as e:
