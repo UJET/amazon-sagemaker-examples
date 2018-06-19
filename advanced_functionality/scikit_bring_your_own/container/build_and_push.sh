@@ -13,8 +13,8 @@ then
     exit 1
 fi
 
-chmod +x decision_trees/train
-chmod +x decision_trees/serve
+chmod +x call_wait_prediction/train
+chmod +x call_wait_prediction/serve
 
 # Get the account number associated with the current IAM credentials
 account=$(aws sts get-caller-identity --query Account --output text)
