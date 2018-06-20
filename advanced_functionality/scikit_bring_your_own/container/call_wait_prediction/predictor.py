@@ -73,12 +73,9 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         # Separate input vars from identifier
-        iVars = input.iloc[:, 1:]
-
         # TODO: train a model that has queue priority level
-        # remove queue priority level
-        if (len(iVars) == 10):
-            iVars = iVars[:-1]
+        # remove queue priority level by ignoring last var
+        iVars = input.iloc[:, 1:-1]
 
         # Apply encoders
         # series is a Pandas series
