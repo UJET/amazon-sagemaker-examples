@@ -75,6 +75,11 @@ class ScoringService(object):
         # Separate input vars from identifier
         iVars = input.iloc[:, 1:]
 
+        # TODO: train a model that has queue priority level
+        # remove queue priority level
+        if (len(iVars) == 10):
+            iVars = iVars[:-1]
+
         # Apply encoders
         # series is a Pandas series
         def resetNovelValuesAndTransform(series, encoder):
