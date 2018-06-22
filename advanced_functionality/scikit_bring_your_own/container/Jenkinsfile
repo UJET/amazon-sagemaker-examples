@@ -1,0 +1,103 @@
+def env_dir
+def ecr_db_migrate_repo
+def db_migrate_docker_image
+def jobnameparts = JOB_NAME.tokenize('/')
+def env_name = jobnameparts[0].split("-", 2)[1]
+
+pipeline {
+    agent any
+
+    parameters {
+        string(defaultValue: 'us-west-2', description: 'Region where we run the pipeline', name: 'REGION')
+        string(defaultValue: 'master',description: 'ujet-infrastructure-live repository branch', name: 'INFRA_LIVE_BRANCH')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                sh '''
+                    pip install boto3
+                '''
+            }
+        }
+
+        stage('Update Infrastructure') {
+            parallel {
+                stage('AWS Deployment') {
+                    steps {
+                        withEnv(["UJET_ENVIRONMENT=${env_name}"]) {
+                            script {
+                                env_dir = sh (
+                                    script: '''
+                                        account_alias=$(aws iam list-account-aliases --output text --query 'AccountAliases[]' | cut -d"-" -f2)
+                                        echo ${account_alias}/${REGION}/sagemaker
+                                    ''',
+                                    returnStdout: true
+                                ).trim()
+                            }
+
+                            dir("ujet-infrastructure-live") {
+                                git(
+                                   url: 'git@github.com:UJET/ujet-infrastructure-live.git',
+                                   credentialsId: 'github-key',
+                                   branch: "${INFRA_LIVE_BRANCH}"
+                                )
+                                sshagent(['github-key']) {
+                                    dir("${env_dir}/ecr-repos") {
+                                        script {
+                                            ecr_db_migrate_repo = sh (
+                                                script: "terragrunt output -no-color ecr_repo_urls | grep sagemaker | cut -d'=' -f2",
+                                                returnStdout: true
+                                            ).trim()
+                                        }
+                                    }
+                                    echo "Found ECR repository in TF output: ${ecr_db_migrate_repo}"
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Build DB migration Docker Image') {
+                    steps {
+                        echo 'About to build a new docker image for database migration task'
+                        dir("advanced_functionality/scikit_bring_your_wn/container")
+                        script {
+                            db_migrate_docker_image = docker.build("sagemaker", "-f Dockerfile .")
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push docker image') {
+            steps {
+                echo 'Pushing docker image to the remote repository'
+                script {
+                    sh 'eval $(aws ecr get-login --no-include-email --region ${REGION})'
+                    docker.withRegistry("https://${ecr_db_migrate_repo}") {
+                        db_migrate_docker_image.push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            deleteDir() /* clean up our workspace */
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}
