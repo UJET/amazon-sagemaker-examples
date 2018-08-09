@@ -38,12 +38,12 @@ class ScoringService(object):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-model.pkl')
             with open(filePath, 'rb') as inp:
-                print("Loaded model, filesize: " + str(os.path.getsize(filePath)))
+                print("Loading model, filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
-            print("Unexpected exception: ", e)
+            print("Unexpected exception: ", traceback.format_exc(e))
         except:
             print("Unexpected error: ", sys.exc_info())
 
@@ -57,12 +57,12 @@ class ScoringService(object):
         try:
             filePath = os.path.join(model_path, 'boosted-trees-encoders.pkl')
             with open(filePath, 'rb') as inp:
-                print("Loaded Encoders, filesize: " + str(os.path.getsize(filePath)))
+                print("Loading Encoders, filesize: " + str(os.path.getsize(filePath)))
                 return pickle.load(inp)
         except IOError as e:
             print("I/O error({0}): {1}".format(e.errno, e.strerror))
         except Exception as e:
-            print("Unexpected exception: ", e)
+            print("Unexpected exception: ", traceback.format_exc(e))
         except:
             print("Unexpected error:", sys.exc_info())
 
